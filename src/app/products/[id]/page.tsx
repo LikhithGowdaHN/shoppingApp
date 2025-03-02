@@ -1,3 +1,5 @@
+"use client";
+
 import { GetServerSideProps } from 'next';
 import { useState } from 'react';
 import { fetchProductById } from "@/app/lib/api";
