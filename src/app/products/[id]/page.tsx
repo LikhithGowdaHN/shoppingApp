@@ -8,7 +8,7 @@ import Image from "next/image";
 import { FaStar } from "react-icons/fa";
 import { CirclePlus, CircleMinus, ChevronLeft } from "lucide-react";
 
-// Back Button
+// Back Button Component
 const BackButton = () => {
   const router = useRouter();
   return (
@@ -22,7 +22,7 @@ const BackButton = () => {
   );
 };
 
-// Quantity Selector
+// Quantity Selector Component
 const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuantity: (q: number) => void }) => (
   <div className="mt-4 bg-gray-800 px-4 py-2 rounded-full flex justify-between items-center w-[180px] mx-auto">
     <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-white hover:text-gray-400">
@@ -35,22 +35,22 @@ const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuan
   </div>
 );
 
-// Product Detail Page
+// Define Product Type
+type Product = {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  thumbnail: string;
+  rating?: number;
+};
+
+// Product Detail Page Component
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const router = useRouter();
-
-  // Define the Product type
-  type Product = {
-    id: string;
-    title: string;
-    description: string;
-    price: number;
-    thumbnail: string;
-    rating?: number;
-  };
 
   useEffect(() => {
     fetchProductById(Number(params.id))
@@ -58,6 +58,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       .catch(() => router.push("/404"));
   }, [params.id, router]);
 
+  // Loading and Error Handling
   if (!product) return <p className="text-white text-center">Loading...</p>;
 
   return (
