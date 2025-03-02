@@ -1,78 +1,65 @@
 "use client";
-
-import { GetServerSideProps } from 'next';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
 import { fetchProductById } from "@/app/lib/api";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/app/products/store/useCart";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { FaStar } from "react-icons/fa";
 import { CirclePlus, CircleMinus, ChevronLeft } from "lucide-react";
 
-// Back Button Component
+//  Back Button
 const BackButton = () => {
   const router = useRouter();
   return (
     <button
       onClick={() => router.back()}
-      className="text-white hover:text-gray-400 transition absolute left-5 top-5"
+      className="text-white hover:text-gray-400 transition"
       aria-label="Go back"
+      style={{ position: "absolute", left: "20px", top: "20px" }}
     >
       <ChevronLeft size={24} color="#f8f7f7" strokeWidth={2.5} />
     </button>
   );
 };
 
-// Quantity Selector Component
-const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuantity: (q: number) => void }) => (
-  <div className="mt-4 bg-gray-800 px-4 py-2 rounded-full flex justify-between items-center w-[180px] mx-auto">
-    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-white hover:text-gray-400">
-      <CircleMinus size={24} color="#f8f7f7" strokeWidth={2.5} />
-    </button>
-    <span className="text-lg font-bold text-yellow-500">{quantity}</span>
-    <button onClick={() => setQuantity(quantity + 1)} className="text-white hover:text-gray-400">
-      <CirclePlus size={24} color="#f8f7f7" strokeWidth={2.5} />
-    </button>
-  </div>
-);
-
-// Define Product Type
-type Product = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  thumbnail: string;
-  rating?: number;
+//  Quantity Selector
+const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuantity: (q: number) => void }) => {
+  return (
+    <div className="mt-4 bg-gray-800 px-4 py-2 rounded-full flex justify-between items-center w-[180px] mx-auto">
+      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-white hover:text-gray-400">
+        <CircleMinus size={24} color="#f8f7f7" strokeWidth={2.5} />
+      </button>
+      <span className="text-lg font-bold text-yellow-500">{quantity}</span>
+      <button onClick={() => setQuantity(quantity + 1)} className="text-white hover:text-gray-400">
+        <CirclePlus size={24} color="#f8f7f7" strokeWidth={2.5} />
+      </button>
+    </div>
+  );
 };
 
-// Fetch Product by ID
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const { id } = params as { id: string };
-  const product = await fetchProductById(Number(id));
-
-  if (!product) {
-    return { notFound: true };
-  }
-
-  return {
-    props: {
-      product,
-    },
-  };
-};
-
-// Product Detail Page Component
-export default function ProductDetail({ product }: { product: Product }) {
+//  Product Detail Page
+export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
+  const [product, setProduct] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
+  const router = useRouter();
+
+  useEffect(() => {
+    params
+      .then(({ id }) => fetchProductById(Number(id)))
+      .then((data) => setProduct(data))
+      .catch(() => router.push("/404"));
+  }, [params, router]);
+
+  if (!product) return <p className="text-white text-center">Loading...</p>;
 
   return (
     <div className="bg-black text-white p-6 relative max-w-[800px] mx-auto">
       {/* Back Button */}
       <BackButton />
 
-      {/* Centered Product Image */}
+      {/* 🔹 Centered Product Image */}
       <div className="mt-8 flex justify-center items-center">
         <div className="relative w-[320px] h-[320px] flex justify-center items-center">
           <Image
