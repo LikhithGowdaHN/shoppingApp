@@ -7,6 +7,16 @@ import { FaStar } from "react-icons/fa";
 import { LuSquare, LuLayoutGrid, LuColumns4 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Define the Product Type
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  thumbnail: string;
+  rating?: number;
+}
+
 // Category Tabs
 const CategoryTabs = ({ selected, setSelected }: { selected: string; setSelected: (cat: string) => void }) => {
   const categories = ["Donuts", "Ice Cream", "Bomboloni"];
@@ -101,7 +111,7 @@ const SortDropdown = ({ sortOrder, setSortOrder }: { sortOrder: string; setSortO
 };
 
 // Product Card
-const ProductCard = ({ product, itemsPerRow }: { product: any; itemsPerRow: number }) => {
+const ProductCard = ({ product, itemsPerRow }: { product: Product; itemsPerRow: number }) => {
   return (
     <Link key={product.id} href={`/products/${product.id}`}>
       <div className="bg-[#1a1a1a] p-4 rounded-lg shadow-lg cursor-pointer transition-transform duration-300 hover:scale-105">
@@ -129,7 +139,7 @@ const ProductCard = ({ product, itemsPerRow }: { product: any; itemsPerRow: numb
 
 // Products Page (With Pagination)
 export default function ProductsPage() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Donuts");
