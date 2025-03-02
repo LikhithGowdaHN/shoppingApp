@@ -8,7 +8,7 @@ import Image from "next/image";
 import { FaStar } from "react-icons/fa";
 import { CirclePlus, CircleMinus, ChevronLeft } from "lucide-react";
 
-// ✅ Back Button
+//  Back Button
 const BackButton = () => {
   const router = useRouter();
   return (
@@ -23,7 +23,7 @@ const BackButton = () => {
   );
 };
 
-// ✅ Quantity Selector
+//  Quantity Selector
 const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuantity: (q: number) => void }) => {
   return (
     <div className="mt-4 bg-gray-800 px-4 py-2 rounded-full flex justify-between items-center w-[180px] mx-auto">
@@ -38,7 +38,7 @@ const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuan
   );
 };
 
-// ✅ Product Detail Page
+//  Product Detail Page
 export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const [product, setProduct] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);

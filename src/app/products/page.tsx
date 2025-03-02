@@ -7,7 +7,7 @@ import { FaStar } from "react-icons/fa";
 import { LuSquare, LuLayoutGrid, LuColumns4 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ✅ Category Tabs
+// Category Tabs
 const CategoryTabs = ({ selected, setSelected }: { selected: string; setSelected: (cat: string) => void }) => {
   const categories = ["Donuts", "Ice Cream", "Bomboloni"];
   return (
@@ -27,7 +27,7 @@ const CategoryTabs = ({ selected, setSelected }: { selected: string; setSelected
   );
 };
 
-// ✅ Layout Switcher
+// Layout Switcher
 const LayoutSwitcher = ({ itemsPerRow, setItemsPerRow }: { itemsPerRow: number; setItemsPerRow: (n: number) => void }) => {
   return (
     <div className="mt-4 flex gap-3">
@@ -53,7 +53,7 @@ const LayoutSwitcher = ({ itemsPerRow, setItemsPerRow }: { itemsPerRow: number; 
   );
 };
 
-// ✅ Sort Dropdown
+// Sort Dropdown
 const SortDropdown = ({ sortOrder, setSortOrder }: { sortOrder: string; setSortOrder: (order: string) => void }) => {
   const [open, setOpen] = useState(false);
 
@@ -100,7 +100,7 @@ const SortDropdown = ({ sortOrder, setSortOrder }: { sortOrder: string; setSortO
   );
 };
 
-// ✅ Product Card
+// Product Card
 const ProductCard = ({ product, itemsPerRow }: { product: any; itemsPerRow: number }) => {
   return (
     <Link key={product.id} href={`/products/${product.id}`}>
@@ -127,7 +127,7 @@ const ProductCard = ({ product, itemsPerRow }: { product: any; itemsPerRow: numb
   );
 };
 
-// ✅ Products Page (With Pagination)
+// Products Page (With Pagination)
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
