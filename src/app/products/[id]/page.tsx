@@ -8,49 +8,55 @@ import Image from "next/image";
 import { FaStar } from "react-icons/fa";
 import { CirclePlus, CircleMinus, ChevronLeft } from "lucide-react";
 
-//  Back Button
+// Back Button
 const BackButton = () => {
   const router = useRouter();
   return (
     <button
       onClick={() => router.back()}
-      className="text-white hover:text-gray-400 transition"
+      className="text-white hover:text-gray-400 transition absolute left-5 top-5"
       aria-label="Go back"
-      style={{ position: "absolute", left: "20px", top: "20px" }}
     >
       <ChevronLeft size={24} color="#f8f7f7" strokeWidth={2.5} />
     </button>
   );
 };
 
-//  Quantity Selector
-const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuantity: (q: number) => void }) => {
-  return (
-    <div className="mt-4 bg-gray-800 px-4 py-2 rounded-full flex justify-between items-center w-[180px] mx-auto">
-      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-white hover:text-gray-400">
-        <CircleMinus size={24} color="#f8f7f7" strokeWidth={2.5} />
-      </button>
-      <span className="text-lg font-bold text-yellow-500">{quantity}</span>
-      <button onClick={() => setQuantity(quantity + 1)} className="text-white hover:text-gray-400">
-        <CirclePlus size={24} color="#f8f7f7" strokeWidth={2.5} />
-      </button>
-    </div>
-  );
-};
+// Quantity Selector
+const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuantity: (q: number) => void }) => (
+  <div className="mt-4 bg-gray-800 px-4 py-2 rounded-full flex justify-between items-center w-[180px] mx-auto">
+    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-white hover:text-gray-400">
+      <CircleMinus size={24} color="#f8f7f7" strokeWidth={2.5} />
+    </button>
+    <span className="text-lg font-bold text-yellow-500">{quantity}</span>
+    <button onClick={() => setQuantity(quantity + 1)} className="text-white hover:text-gray-400">
+      <CirclePlus size={24} color="#f8f7f7" strokeWidth={2.5} />
+    </button>
+  </div>
+);
 
-//  Product Detail Page
-export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
-  const [product, setProduct] = useState<any>(null);
+// Product Detail Page
+export default function ProductDetail({ params }: { params: { id: string } }) {
+  const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const router = useRouter();
 
+  // Define the Product type
+  type Product = {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    thumbnail: string;
+    rating?: number;
+  };
+
   useEffect(() => {
-    params
-      .then(({ id }) => fetchProductById(Number(id)))
+    fetchProductById(Number(params.id))
       .then((data) => setProduct(data))
       .catch(() => router.push("/404"));
-  }, [params, router]);
+  }, [params.id, router]);
 
   if (!product) return <p className="text-white text-center">Loading...</p>;
 
@@ -59,7 +65,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
       {/* Back Button */}
       <BackButton />
 
-      {/* 🔹 Centered Product Image */}
+      {/* Centered Product Image */}
       <div className="mt-8 flex justify-center items-center">
         <div className="relative w-[320px] h-[320px] flex justify-center items-center">
           <Image
