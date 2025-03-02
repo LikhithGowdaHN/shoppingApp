@@ -1,7 +1,6 @@
-"use client";
-import { useEffect, useState } from "react";
+import { GetServerSideProps } from 'next';
+import { useState } from 'react';
 import { fetchProductById } from "@/app/lib/api";
-import { useRouter } from "next/navigation";
 import { useCart } from "@/app/products/store/useCart";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
@@ -45,21 +44,26 @@ type Product = {
   rating?: number;
 };
 
+// Fetch Product by ID
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const { id } = params as { id: string };
+  const product = await fetchProductById(Number(id));
+
+  if (!product) {
+    return { notFound: true };
+  }
+
+  return {
+    props: {
+      product,
+    },
+  };
+};
+
 // Product Detail Page Component
-export default function ProductDetail({ params }: { params: { id: string } }) {
-  const [product, setProduct] = useState<Product | null>(null);
+export default function ProductDetail({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
-  const router = useRouter();
-
-  useEffect(() => {
-    fetchProductById(Number(params.id))
-      .then((data) => setProduct(data))
-      .catch(() => router.push("/404"));
-  }, [params.id, router]);
-
-  // Loading and Error Handling
-  if (!product) return <p className="text-white text-center">Loading...</p>;
 
   return (
     <div className="bg-black text-white p-6 relative max-w-[800px] mx-auto">
