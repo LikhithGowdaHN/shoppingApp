@@ -8,6 +8,16 @@ import Image from "next/image";
 import { FaStar } from "react-icons/fa";
 import { CirclePlus, CircleMinus, ChevronLeft } from "lucide-react";
 
+// Product Type
+type Product = {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  rating?: number;
+  thumbnail: string;
+};
+
 //  Back Button
 const BackButton = () => {
   const router = useRouter();
@@ -39,17 +49,18 @@ const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuan
 };
 
 //  Product Detail Page
-export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
-  const [product, setProduct] = useState<any>(null);
+export default function ProductDetail({ params }: { params: { id: string } }) {
+  const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const router = useRouter();
 
   useEffect(() => {
-    params
-      .then(({ id }) => fetchProductById(Number(id)))
-      .then((data) => setProduct(data))
-      .catch(() => router.push("/404"));
+    if (params?.id) {
+      fetchProductById(Number(params.id))
+        .then((data) => setProduct(data))
+        .catch(() => router.push("/404"));
+    }
   }, [params, router]);
 
   if (!product) return <p className="text-white text-center">Loading...</p>;
@@ -65,10 +76,10 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           <Image
             src={product.thumbnail}
             alt={product.title}
-            layout="intrinsic"
             width={300}
             height={300}
             className="rounded-lg object-contain"
+            priority // ✅ Add this if image is above the fold
           />
         </div>
       </div>
