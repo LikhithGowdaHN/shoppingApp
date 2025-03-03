@@ -1,8 +1,5 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+export default {
   images: {
     domains: ["cdn.dummyjson.com"], // ✅ Allow external images from DummyJSON
   },
 };
-
-module.exports = nextConfig;
