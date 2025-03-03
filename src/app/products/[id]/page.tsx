@@ -9,13 +9,13 @@ import { FaStar } from "react-icons/fa";
 import { CirclePlus, CircleMinus, ChevronLeft } from "lucide-react";
 
 // Product Type
-type Product = {
+type ProductType = {
   id: number;
   title: string;
-  description: string;
   price: number;
-  rating?: number;
   thumbnail: string;
+  description: string;
+  rating: number;
 };
 
 //  Back Button
@@ -34,14 +34,26 @@ const BackButton = () => {
 };
 
 //  Quantity Selector
-const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuantity: (q: number) => void }) => {
+const QuantitySelector = ({
+  quantity,
+  setQuantity,
+}: {
+  quantity: number;
+  setQuantity: (q: number) => void;
+}) => {
   return (
     <div className="mt-4 bg-gray-800 px-4 py-2 rounded-full flex justify-between items-center w-[180px] mx-auto">
-      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-white hover:text-gray-400">
+      <button
+        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+        className="text-white hover:text-gray-400"
+      >
         <CircleMinus size={24} color="#f8f7f7" strokeWidth={2.5} />
       </button>
       <span className="text-lg font-bold text-yellow-500">{quantity}</span>
-      <button onClick={() => setQuantity(quantity + 1)} className="text-white hover:text-gray-400">
+      <button
+        onClick={() => setQuantity(quantity + 1)}
+        className="text-white hover:text-gray-400"
+      >
         <CirclePlus size={24} color="#f8f7f7" strokeWidth={2.5} />
       </button>
     </div>
@@ -50,18 +62,16 @@ const QuantitySelector = ({ quantity, setQuantity }: { quantity: number; setQuan
 
 //  Product Detail Page
 export default function ProductDetail({ params }: { params: { id: string } }) {
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<ProductType | null>(null);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const router = useRouter();
 
   useEffect(() => {
-    if (params?.id) {
-      fetchProductById(Number(params.id))
-        .then((data) => setProduct(data))
-        .catch(() => router.push("/404"));
-    }
-  }, [params, router]);
+    fetchProductById(Number(params.id))
+      .then((data) => setProduct(data))
+      .catch(() => router.push("/404"));
+  }, [params.id, router]);
 
   if (!product) return <p className="text-white text-center">Loading...</p>;
 
@@ -76,10 +86,10 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
           <Image
             src={product.thumbnail}
             alt={product.title}
+            layout="intrinsic"
             width={300}
             height={300}
             className="rounded-lg object-contain"
-            priority // ✅ Add this if image is above the fold
           />
         </div>
       </div>
@@ -107,7 +117,12 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         <button
           className="mt-6 px-6 py-3 bg-yellow-500 text-black font-bold rounded-lg shadow-lg hover:bg-yellow-600 w-full"
           onClick={() => {
-            addToCart({ id: product.id, title: product.title, price: product.price, quantity });
+            addToCart({
+              id: product.id,
+              title: product.title,
+              price: product.price,
+              quantity,
+            });
             toast.success("Added to cart!");
           }}
         >
