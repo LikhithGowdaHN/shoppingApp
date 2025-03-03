@@ -1,14 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fetchProductById } from "@/app/lib/api";
-import { useRouter } from "next/navigation";
-import { useCart } from "@/app/products/store/useCart";
-import { toast } from "react-hot-toast";
-import Image from "next/image";
-import { FaStar } from "react-icons/fa";
-import { CirclePlus, CircleMinus, ChevronLeft } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import BackButton from "@/app/components/BackButton";
+import QuantitySelector from "@/app/components/QuantitySelector";
+import ProductImage from "@/app/components/ProductImage";
+import ProductRating from "@/app/components/ProductRating";
+import AddToCartButton from "@/app/components/AddToCartButton";
 
-// Product Type
 type ProductType = {
   id: number;
   title: string;
@@ -16,118 +15,102 @@ type ProductType = {
   thumbnail: string;
   description: string;
   rating: number;
+  category: string;
 };
 
-//  Back Button
-const BackButton = () => {
-  const router = useRouter();
-  return (
-    <button
-      onClick={() => router.back()}
-      className="text-white hover:text-gray-400 transition"
-      aria-label="Go back"
-      style={{ position: "absolute", left: "20px", top: "20px" }}
-    >
-      <ChevronLeft size={24} color="#f8f7f7" strokeWidth={2.5} />
-    </button>
-  );
-};
-
-//  Quantity Selector
-const QuantitySelector = ({
-  quantity,
-  setQuantity,
-}: {
-  quantity: number;
-  setQuantity: (q: number) => void;
-}) => {
-  return (
-    <div className="mt-4 bg-gray-800 px-4 py-2 rounded-full flex justify-between items-center w-[180px] mx-auto">
-      <button
-        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-        className="text-white hover:text-gray-400"
-      >
-        <CircleMinus size={24} color="#f8f7f7" strokeWidth={2.5} />
-      </button>
-      <span className="text-lg font-bold text-yellow-500">{quantity}</span>
-      <button
-        onClick={() => setQuantity(quantity + 1)}
-        className="text-white hover:text-gray-400"
-      >
-        <CirclePlus size={24} color="#f8f7f7" strokeWidth={2.5} />
-      </button>
-    </div>
-  );
-};
-
-//  Product Detail Page
-export default function ProductDetail({ params }: { params: { id: string } }) {
+export default function ProductDetail() {
+  const { id } = useParams();
   const [product, setProduct] = useState<ProductType | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
   const router = useRouter();
 
   useEffect(() => {
-    fetchProductById(Number(params.id))
-      .then((data) => setProduct(data))
-      .catch(() => router.push("/404"));
-  }, [params.id, router]);
+    if (!id) return;
 
-  if (!product) return <p className="text-white text-center">Loading...</p>;
+    const fetchProduct = async () => {
+      try {
+        const productData = await fetchProductById(Number(id));
+        if (productData) {
+          setProduct(productData);
+        } else {
+          router.push("/404");
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        router.push("/404");
+      }
+    };
+
+    fetchProduct();
+  }, [id, router]);
+
+  if (!product) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-black text-white">
+        <p className="text-2xl font-bold animate-pulse">
+          Loading<span className="dot-animation">...</span>
+        </p>
+        <style jsx>{`
+          @keyframes dots {
+            0% { content: "."; }
+            25% { content: ".."; }
+            50% { content: "..."; }
+            75% { content: "...."; }
+            100% { content: "....."; }
+          }
+          .dot-animation::after {
+            display: inline-block;
+            animation: dots 1.5s infinite steps(5);
+            content: "...";
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-black text-white p-6 relative max-w-[800px] mx-auto">
+    <div className="bg-black text-white p-6 max-w-[1000px] mx-auto relative">
+      
       {/* Back Button */}
-      <BackButton />
+      <div className="absolute top-4 left-4">
+        <BackButton />
+      </div>
 
-      {/* 🔹 Centered Product Image */}
-      <div className="mt-8 flex justify-center items-center">
-        <div className="relative w-[320px] h-[320px] flex justify-center items-center">
-          <Image
-            src={product.thumbnail}
-            alt={product.title}
-            layout="intrinsic"
-            width={300}
-            height={300}
-            className="rounded-lg object-contain"
-          />
-        </div>
+      {/* Product Image */}
+      <div className="mt-12 flex justify-center">
+        <ProductImage src={product.thumbnail} alt={product.title} />
       </div>
 
       {/* Product Details */}
-      <div className="mt-6 px-4 text-center">
-        <h1 className="text-2xl font-semibold">{product.title}</h1>
+      <div className="mt-6 text-center px-4">
+        <h1 className="text-4xl font-extrabold">{product.title}</h1>
+
+        {/* Category */}
+        <p className="text-gray-400 text-sm mt-1 uppercase">{product.category}</p>
 
         {/* Rating */}
-        <div className="mt-2 flex justify-center items-center">
-          <FaStar className="text-yellow-400" />
-          <span className="ml-1 text-lg">{product.rating || "4.0"}</span>
-        </div>
+        <ProductRating rating={product.rating} />
 
         {/* Description */}
-        <p className="text-gray-400 mt-2">{product.description}</p>
+        <p className="text-gray-400 mt-4 text-lg">{product.description}</p>
 
         {/* Quantity Selector */}
-        <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+        <div className="mt-4">
+          <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+        </div>
 
         {/* Price */}
-        <p className="text-xl font-semibold mt-4">${product.price}</p>
+        <p className="text-3xl font-bold mt-5">${product.price}</p>
 
         {/* Add to Cart Button */}
-        <button
-          className="mt-6 px-6 py-3 bg-yellow-500 text-black font-bold rounded-lg shadow-lg hover:bg-yellow-600 w-full"
-          onClick={() => {
-            addToCart({
-              id: product.id,
-              title: product.title,
-              price: product.price,
-              quantity,
-            });
-            toast.success("Added to cart!");
-          }}
-        >
-          Add to cart
-        </button>
+        <div className="mt-6">
+          <AddToCartButton 
+            productId={product.id} 
+            title={product.title} 
+            price={product.price} 
+            quantity={quantity} 
+          />
+        </div>
       </div>
     </div>
   );

@@ -6,12 +6,17 @@ export default function Navbar() {
   const { cart } = useCart(); // Get cart state
 
   return (
-    <nav className="p-4 bg-gray-800 text-white flex justify-between">
-      <Link href="/" className="text-xl font-bold">🛍 MyShop</Link>
-      
-      <Link href="/cart" className="flex items-center space-x-2">
-        🛒 <span>Cart ({cart.length})</span>
-      </Link>
+    <nav className="bg-gray-900 text-white p-4">
+      <div className="max-w-[1000px] mx-auto flex justify-between items-center">
+        {/* 🏠 Shop Name */}
+        <Link href="/" className="text-2xl font-bold">🛍 MyShop</Link>
+        
+        {/* 🛒 Cart */}
+        <Link href="/cart" className="flex items-center gap-2 hover:text-gray-400">
+          <span className="text-lg">🛒</span>
+          <span className="text-lg">Cart ({cart.length})</span>
+        </Link>
+      </div>
     </nav>
   );
 }

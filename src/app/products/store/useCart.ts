@@ -1,11 +1,32 @@
+// app/products/store/useCart.ts
+
 import { create } from "zustand";
 
-interface CartState {
-  cart: { id: number; title: string; price: number }[];
-  addToCart: (item: { id: number; title: string; price: number }) => void;
-}
+type CartItem = {
+  id: number;
+  title: string;
+  price: number;
+  quantity: number; // ✅ Ensure quantity is included
+};
 
-export const useCart = create<CartState>((set) => ({
+type CartStore = {
+  cart: CartItem[];
+  addToCart: (item: CartItem) => void;
+};
+
+export const useCart = create<CartStore>((set) => ({
   cart: [],
-  addToCart: (item) => set((state) => ({ cart: [...state.cart, item] })),
+  addToCart: (item) =>
+    set((state) => {
+      const existingItem = state.cart.find((i) => i.id === item.id);
+      if (existingItem) {
+        return {
+          cart: state.cart.map((i) =>
+            i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+          ),
+        };
+      } else {
+        return { cart: [...state.cart, item] };
+      }
+    }),
 }));
